@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Pesan Tiket</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4F5FB; --card:#FFFFFF; --text:#111827; --muted:#6B7280; --line:#E5E7EB;
+    --brand:#4F46E5; --brand-dark:#4338CA; --brandbg:#EEF2FF; --ok:#059669; --okbg:#ECFDF5; --warn:#B45309; --warnbg:#FFFBEB; --err:#B91C1C; --errbg:#FEF2F2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0B1020; --card:#141A2E; --text:#F3F4F6; --muted:#9CA3AF; --line:#27304A; --brandbg:#1B2250; --okbg:#052E24; --warnbg:#35270A; --errbg:#3B1212; }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);
+       min-height:100vh;padding:max(16px,env(safe-area-inset-top)) 16px max(24px,env(safe-area-inset-bottom));display:flex;justify-content:center}
+  .wrap{width:100%;max-width:460px}
+  .brand{display:flex;align-items:center;gap:10px;margin:8px 4px 16px;font-weight:800;font-size:18px}
+  .logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#6366F1,#4338CA);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+  h1{font-size:20px;margin:0 0 4px}
+  p.sub{margin:0 0 16px;color:var(--muted);font-size:14px;line-height:1.5}
+  .event{background:var(--bg);border-radius:14px;padding:14px;margin-bottom:6px;font-size:14px;line-height:1.55}
+  .event b{font-size:16px;display:block;margin-bottom:2px}
+  .meta{color:var(--muted)}
+  label.l{display:block;font-weight:700;font-size:13px;margin:16px 0 6px}
+  input[type=text],input[type=tel],input[type=email]{width:100%;padding:14px;border:1.5px solid var(--line);border-radius:12px;font:inherit;font-size:16px;background:var(--card);color:var(--text);outline:none}
+  input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(79,70,229,.15)}
+  .hint{font-size:12px;color:var(--muted);margin-top:5px}
+  .types{display:grid;gap:8px}
+  .type{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;cursor:pointer}
+  .type.sel{border-color:var(--brand);background:var(--brandbg)}
+  .type.off{opacity:.45;cursor:not-allowed}
+  .type input{display:none}
+  .type .n{font-weight:700}
+  .type .p{font-weight:800;white-space:nowrap}
+  .type small{display:block;color:var(--muted);font-weight:400}
+  .qty{display:flex;align-items:center;gap:14px}
+  .qty button{width:46px;height:46px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--text);font-size:22px;font-weight:700;cursor:pointer}
+  .qty span{font-size:20px;font-weight:800;min-width:30px;text-align:center}
+  .total{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding:14px;border-radius:12px;background:var(--brandbg);font-weight:800}
+  .total span:last-child{font-size:20px}
+  .consent{display:flex;gap:10px;align-items:flex-start;margin:18px 0 6px;font-size:13px;line-height:1.5;color:var(--muted)}
+  .consent input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--brand)}
+  button.primary{width:100%;margin-top:16px;padding:16px;border:0;border-radius:14px;background:var(--brand);color:#fff;font:inherit;font-weight:800;font-size:16px;cursor:pointer}
+  button.primary:hover{background:var(--brand-dark)}
+  button.primary:disabled{opacity:.6;cursor:not-allowed}
+  .msg{padding:12px 14px;border-radius:12px;font-size:14px;line-height:1.5;margin-top:14px}
+  .msg.err{background:var(--errbg);color:var(--err)}
+  .msg.warn{background:var(--warnbg);color:var(--warn)}
+  .msg.ok{background:var(--okbg);color:var(--ok)}
+  .center{text-align:center;padding:6px 0}
+  .big{font-size:46px;margin-bottom:6px}
+  .ref{font-size:42px;font-weight:800;letter-spacing:6px;margin:8px 0;color:var(--brand)}
+  .sum{background:var(--bg);border-radius:14px;padding:14px;margin:14px 0;font-size:14px;line-height:1.6;text-align:left}
+  .hidden{display:none!important}
+  .spin{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--brand);border-radius:50%;animation:s .8s linear infinite;margin:20px auto}
+  .spin.sm{width:18px;height:18px;border-width:2.5px;display:inline-block;margin:0 8px -3px 0}
+  @keyframes s{to{transform:rotate(360deg)}}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><div class="logo" id="logo">🎟</div><span id="brand">Pesan Tiket</span></div>
+
+  <div class="card">
+    <div id="vLoading"><div class="spin"></div><p class="sub center">Memuat…</p></div>
+
+    <div id="vInvalid" class="center hidden">
+      <div class="big">⚠️</div>
+      <h1>Tidak bisa dibuka</h1>
+      <p class="sub" id="invalidText">Link ini tidak valid. Silakan scan ulang QR di loket atau hubungi kasir.</p>
+    </div>
+
+    <!-- Form pesanan -->
+    <div id="vForm" class="hidden">
+      <h1>Pesan tiket</h1>
+      <p class="sub">Pilih tiket dan isi data Anda, lalu bayar ke kasir. E-ticket dikirim ke WhatsApp setelah pembayaran dikonfirmasi.</p>
+      <div class="event" id="eventBox"></div>
+
+      <form id="f" novalidate>
+        <label class="l">Pilih kategori tiket</label>
+        <div class="types" id="types"></div>
+
+        <label class="l">Jumlah tiket</label>
+        <div class="qty"><button type="button" id="minus" aria-label="Kurangi">−</button><span id="qtyVal">1</span><button type="button" id="plus" aria-label="Tambah">+</button></div>
+
+        <div class="total"><span>Total bayar</span><span id="total">Rp 0</span></div>
+
+        <label class="l" for="name">Nama lengkap</label>
+        <input id="name" type="text" autocomplete="name" maxlength="80" placeholder="Contoh: Budi Santoso" required>
+
+        <label class="l" for="phone">Nomor WhatsApp</label>
+        <input id="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="08123456789" required>
+        <div class="hint">E-ticket dikirim ke nomor ini. Pastikan aktif di WhatsApp.</div>
+
+        <label class="l" for="email">Email <span style="font-weight:400;color:var(--muted)">(opsional)</span></label>
+        <input id="email" type="email" inputmode="email" autocomplete="email" maxlength="120" placeholder="budi@example.com">
+
+        <label class="consent"><input id="consent" type="checkbox">
+          <span>Saya setuju data saya digunakan untuk pengiriman tiket dan keperluan penyelenggaraan event ini.</span></label>
+
+        <div id="formErr" class="msg err hidden"></div>
+        <button id="submitBtn" class="primary" type="submit">Kirim Pesanan</button>
+      </form>
+    </div>
+
+    <!-- Menunggu konfirmasi kasir -->
+    <div id="vWait" class="center hidden">
+      <div class="big">🧾</div>
+      <h1>Pesanan terkirim</h1>
+      <p class="sub">Tunjukkan kode ini ke kasir dan lakukan pembayaran.</p>
+      <div class="ref" id="refCode"></div>
+      <div class="sum" id="waitSum"></div>
+      <div class="msg warn"><span class="spin sm"></span>Menunggu kasir mengonfirmasi pembayaran…<br><small>Jangan tutup halaman ini.</small></div>
+    </div>
+
+    <!-- Selesai -->
+    <div id="vDone" class="center hidden">
+      <div class="big">✅</div>
+      <h1>Pembayaran dikonfirmasi</h1>
+      <p class="sub" id="doneText"></p>
+    </div>
+
+    <!-- Dibatalkan -->
+    <div id="vCancel" class="center hidden">
+      <div class="big">🚫</div>
+      <h1>Pesanan dibatalkan</h1>
+      <p class="sub">Pesanan ini dibatalkan oleh kasir. Silakan hubungi kasir atau buat pesanan baru.</p>
+    </div>
+  </div>
+  <footer id="foot"></footer>
+</div>
+
+<script>
+(() => {
+  // Alamat fungsi order-form di Supabase. Editor dashboard memberi alamat acak:
+  // samakan dengan kolom URL fungsi tersebut di Supabase -> Edge Functions.
+  const ORDER_FUNCTION_URL = "https://pwyrdulqmqfuatbwgzri.supabase.co/functions/v1/order-form";
+
+  const $ = (id) => document.getElementById(id);
+  const VIEWS = ["vLoading","vInvalid","vForm","vWait","vDone","vCancel"];
+  const show = (id) => VIEWS.forEach(v => $(v).classList.toggle("hidden", v !== id));
+  const token = (new URLSearchParams(location.search).get("b") || "").trim();
+  const idr = (n) => "Rp " + Number(n || 0).toLocaleString("id-ID");
+  const esc = (v) => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const fmtDate = (iso) => iso ? new Date(iso).toLocaleString("id-ID", { dateStyle: "full", timeStyle: "short", timeZone: "Asia/Jakarta" }) + " WIB" : "";
+
+  let types = [], selected = null, qty = 1, maxQty = 10, pollTimer = null;
+  const STORE_KEY = "order_pending_" + token.slice(0, 12);
+
+  async function call(payload) {
+    // text/plain = request sederhana (tanpa preflight CORS)
+    const res = await fetch(ORDER_FUNCTION_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: JSON.stringify(payload) });
+    let data = null; try { data = await res.json(); } catch (_) {}
+    if (!res.ok || (data && data.error)) { const e = new Error((data && (data.error || data.message)) || ("HTTP " + res.status)); e.status = res.status; throw e; }
+    return data;
+  }
+
+  function renderTypes() {
+    $("types").innerHTML = types.map(t => {
+      const out = t.available <= 0;
+      return `<label class="type ${selected === t.id ? "sel" : ""} ${out ? "off" : ""}" data-id="${esc(t.id)}">
+        <input type="radio" name="tt" ${out ? "disabled" : ""}>
+        <span class="n">${esc(t.name)}<small>${out ? "Habis" : "Tersedia"}</small></span>
+        <span class="p">${idr(t.price)}</span></label>`;
+    }).join("") || '<div class="msg warn">Belum ada kategori tiket yang dijual.</div>';
+    $("types").querySelectorAll(".type").forEach(el => el.onclick = (ev) => {
+      ev.preventDefault();
+      const t = types.find(x => x.id === el.dataset.id);
+      if (!t || t.available <= 0) return;
+      selected = t.id; qty = Math.min(qty, Math.min(t.available, maxQty)) || 1;
+      renderTypes(); update();
+    });
+  }
+  function update() {
+    const t = types.find(x => x.id === selected);
+    $("qtyVal").textContent = qty;
+    $("total").textContent = idr(t ? t.price * qty : 0);
+  }
+  $("minus").onclick = () => { if (qty > 1) { qty--; update(); } };
+  $("plus").onclick = () => { const t = types.find(x => x.id === selected); const cap = t ? Math.min(t.available, maxQty) : maxQty; if (qty < cap) { qty++; update(); } };
+
+  function setWait(o) {
+    $("refCode").textContent = o.ref;
+    $("waitSum").innerHTML = `<b>${esc(o.ticket_type)}</b> × ${esc(o.qty)}<br>Total: <b>${idr(o.total)}</b><br>Atas nama: ${esc(o.name)}<br>WhatsApp: ${esc(o.phone)}`;
+    show("vWait");
+    clearInterval(pollTimer);
+    const started = Date.now();
+    const tick = async () => {
+      if (Date.now() - started > 3 * 3600 * 1000) { clearInterval(pollTimer); return; }
+      try {
+        const r = await call({ action: "status", order_id: o.order_id });
+        if (r.status === "confirmed") {
+          clearInterval(pollTimer); try { localStorage.removeItem(STORE_KEY); } catch (_) {}
+          $("doneText").textContent = "E-ticket (berisi QR) dikirim ke WhatsApp " + o.phone + ". Tunjukkan QR-nya ke petugas gate.";
+          show("vDone");
+        } else if (r.status === "cancelled") {
+          clearInterval(pollTimer); try { localStorage.removeItem(STORE_KEY); } catch (_) {}
+          show("vCancel");
+        }
+      } catch (_) { /* coba lagi pada putaran berikutnya */ }
+    };
+    pollTimer = setInterval(tick, 5000); tick();
+  }
+
+  async function init() {
+    if (!token) { show("vInvalid"); return; }
+    // lanjutkan pesanan yang sedang menunggu jika halaman dimuat ulang
+    let saved = null; try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); } catch (_) {}
+    try {
+      const info = await call({ action: "info", token });
+      if (info.brand) {
+        document.title = "Pesan Tiket — " + info.brand;
+        $("brand").textContent = info.brand;
+        $("logo").textContent = (info.brand.trim()[0] || "🎟").toUpperCase();
+        $("foot").textContent = info.brand + (info.box && info.box.name ? " • " + info.box.name : "");
+      }
+      maxQty = info.max_qty || 10; types = info.types || [];
+      $("eventBox").innerHTML = `<b>${esc(info.event.name)}</b>` +
+        (info.event.date ? `<div class="meta">${esc(fmtDate(info.event.date))}</div>` : "") +
+        (info.event.venue ? `<div class="meta">${esc(info.event.venue)}</div>` : "");
+      const first = types.find(t => t.available > 0); selected = first ? first.id : null;
+      renderTypes(); update();
+      if (saved && saved.order_id) { setWait(saved); return; }
+      show("vForm");
+    } catch (e) {
+      if (e.status === 404) $("invalidText").textContent = "Link tidak valid atau loket tidak aktif. Silakan scan ulang QR di loket.";
+      else if (e.status) $("invalidText").textContent = "Terjadi gangguan: " + e.message + ". Coba lagi beberapa saat atau datang ke kasir.";
+      else $("invalidText").textContent = "Tidak bisa terhubung ke server. Periksa koneksi internet lalu muat ulang halaman ini.";
+      show("vInvalid");
+    }
+  }
+
+  $("f").addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    const err = $("formErr"); err.classList.add("hidden");
+    const fail = (m) => { err.textContent = m; err.classList.remove("hidden"); };
+    const name = $("name").value.trim(), phone = $("phone").value.trim(), email = $("email").value.trim();
+    if (!selected) return fail("Pilih kategori tiket terlebih dahulu.");
+    if (name.length < 2) return fail("Nama minimal 2 karakter.");
+    if (phone.replace(/\D/g, "").length < 9) return fail("Nomor WhatsApp belum lengkap.");
+    if (!$("consent").checked) return fail("Centang persetujuan untuk melanjutkan.");
+    const btn = $("submitBtn"); btn.disabled = true; btn.textContent = "Mengirim…";
+    try {
+      const r = await call({ action: "submit", token, name, phone, email, ticket_type_id: selected, qty, consent: true });
+      const o = { order_id: r.order_id, ref: r.ref, total: r.total, ticket_type: r.ticket_type, qty: r.qty, name, phone };
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch (_) {}
+      setWait(o);
+    } catch (e) {
+      fail(e.message || "Gagal mengirim. Coba lagi.");
+      btn.disabled = false; btn.textContent = "Kirim Pesanan";
+    }
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>
